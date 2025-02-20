@@ -9,7 +9,7 @@ class Device:
 
 @dataclass
 class Camera:
-    id: int = 0
+    id: int = 1
     sensor: str = "IMX296"  
     res_w: int = 1280      
     res_h: int = 720      

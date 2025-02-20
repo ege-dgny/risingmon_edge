@@ -1,0 +1,9 @@
+{
+    "width": 1280,
+    "height": 720,
+    "framerate": 60,
+    "bitrate": 500,
+    "host": "192.168.2.2",
+    "port0": 5000,
+    "port1": 5001
+}
