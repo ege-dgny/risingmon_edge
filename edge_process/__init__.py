@@ -5,7 +5,7 @@ import ntcore
 import threading
 from queue import Queue
 
-from configuration.Configuration import PolarisConfiguration
+from configuration.Configuration import RisingMoonConfiguration
 from configuration.ConfigurationRetriever import ConfigurationRetriever
 from calibration.Calibration import Calibrator
 from calibration.CalibrationController import NTCalibrationController
@@ -18,7 +18,7 @@ from pipeline.Detector import Detector
 from pipeline.Capture import GStreamerCapture
 
 # Load Configuration
-configuration = PolarisConfiguration()
+configuration = RisingMoonConfiguration()
 sub = ConfigurationRetriever()
 pub = NTPublisher()
 calibrator = Calibrator()
@@ -34,20 +34,17 @@ calibration_started = False
 frame_counts = [0, 0]
 last_print = time.time()
 
-# RTP Stream Details (Adjust ports based on Raspberry Pi settings)
 rtp_streams = [
-    {"camera_id": 0, "port": 5000},  # Camera 1
-    {"camera_id": 1, "port": 5001}   # Camera 2
+    {"camera_id": 0, "port": 5000}, 
+    {"camera_id": 1, "port": 5001}  
 ]
 
-# Queue for thread-safe frame storage
 frame_queues = {0: Queue(), 1: Queue()}
 
 def process_rtp_stream(camera_id, port):
     """Processes an RTP video stream, performs detection & pose estimation, and stores frames in a queue."""
     print(f"Starting RTP Stream Processing for Camera {camera_id} on Port {port}")
 
-    # Improved GStreamer pipeline with buffering fixes
     gst_pipeline = (
         f"udpsrc port={port} caps=\"application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96\" ! "
         f"rtpjitterbuffer latency=100 ! "
@@ -62,7 +59,7 @@ def process_rtp_stream(camera_id, port):
 
     global calibration_started, last_print
     fps = 0
-    target_fps = 30  # Adjust if needed
+    target_fps = 30 
     frame_time = 1 / target_fps
 
     while True:
@@ -75,7 +72,6 @@ def process_rtp_stream(camera_id, port):
             time.sleep(0.1)
             continue
 
-        # FPS Calculation
         frame_counts[camera_id] += 1
         elapsed_time = time.time() - last_print
         if elapsed_time > 1:
@@ -84,7 +80,6 @@ def process_rtp_stream(camera_id, port):
             frame_counts[camera_id] = 0
             last_print = time.time()
 
-        # Handle Calibration Mode
         if calibration_controller.get_calibration_mode(configuration.device):
             calibration_started = True
             calibrator.process_frame(
@@ -96,7 +91,6 @@ def process_rtp_stream(camera_id, port):
             sub.updateLocal(configuration)
             calibration_started = False
         else:
-            # Detect 2D Markers
             markers = processor.detectAruco(frame)
             cv2.aruco.drawDetectedMarkers(
                 frame,
@@ -107,20 +101,16 @@ def process_rtp_stream(camera_id, port):
                 FiducialObservation2d(m.tag_id, m.corners) for m in markers
             ]
 
-            # Pose Estimation
             pose_observation = pose_estimator.solve_camera_pose(
                 observations2d, configuration, configuration.intrinsics
             )
 
             pub.send(configuration.device, timestamp, pose_observation, fps)
 
-        # Store the frame in the queue
         frame_queues[camera_id].put(frame)
 
-        # Stream processed frame
         stream.set_frame(frame)
 
-        # Maintain target FPS
         elapsed_time = time.time() - start_time
         sleep_time = max(0, frame_time - elapsed_time)
         time.sleep(sleep_time)
@@ -140,22 +130,20 @@ def display_frames():
 
     cv2.destroyAllWindows()
 
-# Start Threads for Processing and Display
 if __name__ == "__main__":
     #print("Using OpenCV Version %s" % (cv2.__version__))
 
     #print(f"Tag Map: {configuration.environment.tag_map}")
 
-
     # Initialize NetworkTables
     ntcore.NetworkTableInstance.getDefault().setServer("10.85.61.2")
     ntcore.NetworkTableInstance.getDefault().startClient4(configuration.device.device_id)
+    ntcore.NetworkTableInstance.getDefault().startServer(port4=8000) 
 
     # Wait until the environment is ready
     while configuration.environment.tag_map is None:
         sub.updateNT(configuration)
 
-    # Start processing threads
     threads = []
     for cam_stream in rtp_streams:
         thread = threading.Thread(
@@ -166,7 +154,6 @@ if __name__ == "__main__":
         thread.start()
         threads.append(thread)
 
-    # Start display thread
     display_thread = threading.Thread(target=display_frames, daemon=True)
     display_thread.start()
 

@@ -4,23 +4,19 @@ import os
 import multiprocessing
 import time
 
-# Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 config_file = os.path.join(script_dir, "config.json")
 
-# Load JSON configuration file
 with open(config_file, "r") as file:
     config = json.load(file)
 
-# Extract parameters
 width = config.get("width", 1456)
 height = config.get("height", 1088)
 framerate = config.get("framerate", 60)
-target_ip = config.get("host", "127.0.0.1")  # UDP destination IP
+target_ip = config.get("host", "10.85.61.30")  # UDP destination IP
 target_port0 = config.get("port0", 5000)       # UDP destination port
 target_port1 = config.get("port1", 5001) 
 
-# Define camera paths (Update these from `libcamera-hello --list-cameras`)
 camera_paths = [
     "/base/axi/pcie@120000/rp1/i2c@80000/imx296@1a",
     "/base/axi/pcie@120000/rp1/i2c@88000/imx296@1a"
@@ -46,7 +42,6 @@ def run_camera(camera_path, port):
 
         print(f"[INFO] Camera {camera_path} stream is running...")
 
-        # Read stderr to output the FPS stats
         while True:
             line = process.stderr.readline()
             if line == '' and process.poll() is not None:
@@ -56,7 +51,7 @@ def run_camera(camera_path, port):
 
         exit_code = process.wait()
         print(f"[ERROR] Camera {camera_path} process ended with exit code {exit_code}. Restarting quickly...")
-        time.sleep(0.1)  # Minimal delay before restart
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     camera1 = multiprocessing.Process(target=run_camera, args=(camera_paths[0], target_port0))

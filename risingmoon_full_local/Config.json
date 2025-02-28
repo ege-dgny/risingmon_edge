@@ -1,5 +1,5 @@
 {
-    "device_id": "PolarisRight",
-    "server_ip": "10.16.78.3",
+    "device_id": "rising_moon_local",
+    "server_ip": "10.85.61.3",
     "stream_port": 8000
 }

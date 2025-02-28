@@ -2,7 +2,7 @@ from typing import List
 import cv2
 
 import numpy as np
-from configuration.Configuration import PolarisConfiguration, Intrinsics
+from configuration.Configuration import RisingMoonConfiguration, Intrinsics
 from Observations import FiducialObservation2d, CameraPoseObservation3d
 from wpimath.geometry import *
 from Util import *
@@ -15,7 +15,7 @@ class PoseEstimator:
     def solve_camera_pose(
         self,
         observations: List[FiducialObservation2d],
-        configuration: PolarisConfiguration,
+        configuration: RisingMoonConfiguration,
         intrinsics: Intrinsics,
     ) -> CameraPoseObservation3d:
         if configuration.environment.tag_map is None:

@@ -1,10 +1,14 @@
 from dataclasses import dataclass, field
-import numpy
+import numpy as np
+import json
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 @dataclass
 class Device:
-    device_id: str = "polaris"
-    server_ip: str = "10.16.78.2"
+    device_id: str = "rising_moon"
+    server_ip: str = "10.85.61.2"
     stream_port: int = 8000
 
 @dataclass
@@ -21,16 +25,25 @@ class Camera:
 @dataclass
 class Environment:
     tag_size_m: float = 0.1651
-    tag_map: any = "frc2025r2_ANDYMARK.fmap"
+    tag_map: dict = field(default_factory=lambda: Environment.load_tag_map())
+
+    @staticmethod
+    def load_tag_map():
+        map_file = os.path.join(script_dir, "2025-official.json")
+        try:
+            with open(map_file, "r") as file:
+                return json.load(file) 
+        except Exception as e:
+            print(f"Error loading tag map: {e}")
+            return {}
 
 @dataclass
 class Intrinsics:
-    camera_matrix: numpy._typing.NDArray[numpy.float64] = field(default_factory=lambda: numpy.array([]))
-    distortion_coefficients: numpy._typing.NDArray[numpy.float64] = field(default_factory=lambda: numpy.array([]))
+    camera_matrix: np.ndarray = field(default_factory=lambda: np.array([]))
+    distortion_coefficients: np.ndarray = field(default_factory=lambda: np.array([]))
 
-# Main config class
 @dataclass
-class PolarisConfiguration:
+class RisingMoonConfiguration:
     camera: Camera = field(default_factory=Camera)
     intrinsics: Intrinsics = field(default_factory=Intrinsics)
     device: Device = field(default_factory=Device)

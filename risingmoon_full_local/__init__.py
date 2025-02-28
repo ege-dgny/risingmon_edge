@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import ntcore
 
-from configuration.Configuration import PolarisConfiguration
+from configuration.Configuration import RisingMoonConfiguration
 from configuration.ConfigurationRetriever import ConfigurationRetriever
 from calibration.Calibration import Calibrator
 from calibration.CalibrationController import NTCalibrationController
@@ -21,7 +21,7 @@ calibration_started: bool = False
 if __name__ == "__main__":
     print("Using OpenCV Version %s" % (cv2.__version__))
 
-    configuration = PolarisConfiguration()
+    configuration = RisingMoonConfiguration()
 
     capture = GStreamerCapture()
     processor = Detector()
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     retval, frame = capture.get_frame(configuration.camera)
     print(retval)
 
-    ntcore.NetworkTableInstance.getDefault().setServer("10.16.78.2")
+    ntcore.NetworkTableInstance.getDefault().setServer("10.85.61.2")
     ntcore.NetworkTableInstance.getDefault().startClient4(
         configuration.device.device_id
     )

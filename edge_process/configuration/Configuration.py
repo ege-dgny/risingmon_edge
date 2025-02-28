@@ -7,7 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 @dataclass
 class Device:
-    device_id: str = "polaris"
+    device_id: str = "rising_moon"
     server_ip: str = "10.85.61.2"
     stream_port: int = 8000
 
@@ -43,7 +43,7 @@ class Intrinsics:
     distortion_coefficients: np.ndarray = field(default_factory=lambda: np.array([]))
 
 @dataclass
-class PolarisConfiguration:
+class RisingMoonConfiguration:
     camera: Camera = field(default_factory=Camera)
     intrinsics: Intrinsics = field(default_factory=Intrinsics)
     device: Device = field(default_factory=Device)
