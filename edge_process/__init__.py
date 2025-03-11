@@ -62,6 +62,8 @@ def process_rtp_stream(camera_id, port):
     target_fps = 30 
     frame_time = 1 / target_fps
 
+    latency_table = ntcore.NetworkTableInstance.getDefault().getTable("Latency")
+
     while True:
         start_time = time.time()
         ret, frame = cap.read()
@@ -105,13 +107,18 @@ def process_rtp_stream(camera_id, port):
                 observations2d, configuration, configuration.intrinsics
             )
 
-            pub.send(configuration.device, timestamp, pose_observation, fps)
+            pub.send(camera_id, configuration.device, timestamp, pose_observation, fps)
+
 
         frame_queues[camera_id].put(frame)
 
-        stream.set_frame(frame)
+        #stream.set_frame(frame)
 
-        elapsed_time = time.time() - start_time
+        total_latency = time.time() - start_time
+        print(f"Camera {camera_id} - Total Latency: {total_latency:.3f} seconds")
+
+        latency_table.putNumber(f"Camera{camera_id}Latency", total_latency)
+
         sleep_time = max(0, frame_time - elapsed_time)
         time.sleep(sleep_time)
 
@@ -154,8 +161,8 @@ if __name__ == "__main__":
         thread.start()
         threads.append(thread)
 
-    display_thread = threading.Thread(target=display_frames, daemon=True)
-    display_thread.start()
+    #display_thread = threading.Thread(target=display_frames, daemon=True)
+    #display_thread.start()
 
     for thread in threads:
         thread.join()

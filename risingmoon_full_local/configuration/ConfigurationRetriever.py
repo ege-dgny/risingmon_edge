@@ -4,7 +4,7 @@ import ntcore
 import math
 
 import numpy
-from configuration.Configuration import Intrinsics, PolarisConfiguration
+from configuration.Configuration import Intrinsics, RisingMoonConfiguration
 
 
 class ConfigurationRetriever:
@@ -21,7 +21,7 @@ class ConfigurationRetriever:
     _fiducial_size_m_sub: ntcore.DoubleSubscriber
     _tag_layout_sub: ntcore.DoubleSubscriber
 
-    def updateLocal(self, configuration: PolarisConfiguration):
+    def updateLocal(self, configuration: RisingMoonConfiguration):
         with open(self.CONFIG_FILENAME, "r") as config_file:
             config_data = json.loads(config_file.read())
             configuration.device.device_id = config_data["device_id"]
@@ -39,7 +39,7 @@ class ConfigurationRetriever:
             configuration.intrinsics.camera_matrix = camera_matrix
             configuration.intrinsics.distortion_coefficients = distort_coeffs
 
-    def updateNT(self, configuration: PolarisConfiguration) -> None:
+    def updateNT(self, configuration: RisingMoonConfiguration) -> None:
         if not self._nt_initialized:
             nt_table = ntcore.NetworkTableInstance.getDefault().getTable(
                 "/" + configuration.device.device_id + "/configs"
