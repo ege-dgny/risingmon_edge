@@ -21,13 +21,13 @@ sudo apt-get -y upgrade
 echo "=== Installing system dependencies for Python, OpenCV, and GStreamer ==="
 sudo apt-get install -y \
     python3-pip \
-    libopencv-dev \
     gstreamer1.0-tools \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly \
     python3-opencv \
+    libopencv-dev
 
 echo "=== Upgrading pip ==="
 python3 -m pip install --upgrade pip
