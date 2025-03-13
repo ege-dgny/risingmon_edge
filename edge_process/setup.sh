@@ -37,9 +37,9 @@ echo "=== Upgrading pip ==="
 python3 -m pip install --upgrade pip
 
 echo "=== Installing Python libraries (robotpy, ntcore, numpy) ==="
-python3 -m pip install --upgrade \
-    robotpy \
-    numpy 
+python3 -m pip install --break-system-packages --upgrade \
+    --break-system-packages robotpy \
+    --break-system-packages numpy 
 
 echo "=== Cloning and building OpenCV from source ==="
 cd ~
