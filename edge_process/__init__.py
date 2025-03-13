@@ -39,7 +39,7 @@ rtp_streams = [
     {"camera_id": 1, "port": 5001}  
 ]
 
-frame_queues = {0: Queue(), 1: Queue()}
+frame_queues = {0: Queue(maxsize=210), 1: Queue(maxsize=210)}
 
 def process_rtp_stream(camera_id, port):
     """Processes an RTP video stream, performs detection & pose estimation, and stores frames in a queue."""
@@ -108,8 +108,11 @@ def process_rtp_stream(camera_id, port):
             )
 
             pub.send(camera_id, configuration.device, timestamp, pose_observation, fps)
-
-
+        if frame_queues[camera_id].full():
+            try:
+                frame_queues[camera_id].get_nowait()
+            except:
+                pass
         frame_queues[camera_id].put(frame)
 
         #stream.set_frame(frame)
